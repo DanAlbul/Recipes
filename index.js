@@ -43,14 +43,13 @@ function addMeal(mealData, random = false) {
       <div class="meal-body">
         <h4 title="${mealData.strMeal}">${mealData.strMeal}</h4>
         <button class="fav-btn">
-        <i class="fas fa-heart"></i>
-      </button>
+        	<i class="fas fa-heart"></i>
+      	</button>
     </div>`;
 
 	const fav_btn = meal.querySelector('.meal-body .fav-btn');
 	fav_btn.addEventListener('click', (e) => {
 		if (fav_btn.classList.contains('active')) {
-			removeMealLS(mealData.idMeal);
 			e.target.classList.remove('active');
 			fav_btn.classList.remove('active');
 			removeMealFavEl(mealData);
@@ -58,32 +57,12 @@ function addMeal(mealData, random = false) {
 			addMealLS(mealData.idMeal);
 			e.target.classList.add('active');
 			fav_btn.classList.add('active');
-			const template = document.createElement('template');
-			template.innerHTML = createMealFavNode(mealData);
-			const node = template.content.firstElementChild;
+			const node = createMealFavNode(mealData);
 			favoriteContainer.prepend(node);
 		}
 	});
 
 	meals.appendChild(meal);
-}
-
-function addMealLS(mealId) {
-	const mealIds = meal_ids === null ? [] : meal_ids;
-	if (localStorage.getItem('mealId') === null) {
-		localStorage.setItem('mealIds', JSON.stringify([...mealIds, mealId]));
-	}
-}
-
-function removeMealLS(mealId) {
-	const mealIds = meal_ids === null ? [] : meal_ids;
-
-	localStorage.setItem('mealIds', JSON.stringify(mealIds.filter((id) => id !== mealId)));
-}
-
-function getMealsLS() {
-	const mealIds = JSON.parse(localStorage.getItem('mealIds'));
-	return mealIds === null ? [] : mealIds;
 }
 
 async function fetchFavMeals(render = false) {
@@ -92,7 +71,7 @@ async function fetchFavMeals(render = false) {
 		and append them to favorite meals container 
 		without idling too much time 
 	*/
-	const mealsArr = [];
+	let mealsArr = [];
 	const mealIds = meal_ids === null ? [] : meal_ids;
 	const repeats = mealIds.length === 1 ? 1 : mealIds.length - 1;
 	for (let i = repeats; i >= 0; i--) {
@@ -101,9 +80,7 @@ async function fetchFavMeals(render = false) {
 		if (render) {
 			meal.then((res) => {
 				const fav_node = createMealFavNode(res.meals[0]);
-				const template = document.createElement('template');
-				template.innerHTML = fav_node;
-				favoriteContainer.prepend(template.content);
+				favoriteContainer.prepend(fav_node);
 			});
 		} else {
 			/* 
@@ -115,26 +92,61 @@ async function fetchFavMeals(render = false) {
 			});
 		}
 	}
-	if (!render) return mealsArr;
+
+	if (!render) return (mealsArr = mealsArr === null ? [] : mealsArr);
 }
 
 function createMealFavNode(mealData) {
-	const fav_meal = `
-    <li class="fav" id="${mealData.idMeal}">
-      <img
-        draggable="false"
-        src="${mealData.strMealThumb}/preview"
-        alt="${mealData.strMeal}"
-      />
-      <span title="${mealData.strMeal}">${mealData.strMeal}</span>
-    </li>
-  `;
+	const fav_meal = document.createElement('li');
+	fav_meal.classList.add('fav');
+	fav_meal.id = mealData.idMeal;
+	fav_meal.innerHTML = `
+			<img
+				draggable="false"
+				src="${mealData.strMealThumb}/preview"
+				alt="${mealData.strMeal}"
+			/>
+			<span title="${mealData.strMeal}">${mealData.strMeal}</span>
+			<button class="unfav">
+				<i class="fa-solid fa-heart-circle-minus"></i>
+			</button>
+`;
+
+	const unfav_btn = fav_meal.querySelector('.unfav');
+	unfav_btn.addEventListener('click', (e) => {
+		const unfav = e.target.closest('li');
+		const unfav_id = unfav.id;
+		const meals = JSON.parse(localStorage.getItem('mealIds'));
+		localStorage.setItem(
+			'mealIds',
+			JSON.stringify(meals.filter((el) => el !== unfav_id))
+		);
+		favoriteContainer.removeChild(unfav);
+	});
 	return fav_meal;
 }
 
 function removeMealFavEl(mealData) {
+	removeMealLS(mealData.idMeal);
 	const fav = document.getElementById(mealData.idMeal);
 	favoriteContainer.removeChild(fav);
+}
+
+function addMealLS(mealId) {
+	const mealIds = meal_ids === null ? [] : meal_ids;
+	if (localStorage.getItem('mealId') === null) {
+		localStorage.setItem('mealIds', JSON.stringify([...mealIds, mealId]));
+	}
+}
+
+function removeMealLS(mealId) {
+	const mealIds = meal_ids === null ? [] : meal_ids;
+	localStorage.setItem('mealIds', JSON.stringify(mealIds.filter((id) => id !== mealId)));
+}
+
+function getMealsLS() {
+	const mealIds = JSON.parse(localStorage.getItem('mealIds'));
+	return mealIds === null ? [] : mealIds;
 }
 
 main();
