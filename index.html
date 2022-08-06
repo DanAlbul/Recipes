@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="style.css" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&family=Press+Start+2P&display=swap"
+			rel="stylesheet"
+		/>
+		<script
+			src="https://kit.fontawesome.com/77ed19275a.js"
+			crossorigin="anonymous"
+		></script>
+		<title>Recipes</title>
+	</head>
+	<body>
+		<div class="mobile-container">
+			<header>
+				<div class="burger-menu">
+					<i class="fa-solid fa-bars"></i>
+				</div>
+				<input id="search" type="text" value="Search" />
+				<button id="search">
+					<i class="fa-solid fa-magnifying-glass"></i>
+				</button>
+			</header>
+			<div class="fav-container">
+				<h3>Favourite Meals</h3>
+				<ul class="fav-meals" id="fav-meals"></ul>
+			</div>
+			<div class="meals" id="meals"></div>
+		</div>
+
+		<script src="index.js"></script>
+	</body>
+</html>
