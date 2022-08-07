@@ -1,7 +1,13 @@
+import { show } from './dialog.js';
+
 const meals = document.getElementById('meals');
 const favoriteContainer = document.getElementById('fav-meals');
 const favs = document.querySelectorAll('.fav');
-const meal_ids = JSON.parse(localStorage.getItem('mealIds'));
+let search_results;
+
+const searchInput = document.getElementById('search-bar');
+searchInput.placeholder = 'ingredient';
+const searchBtn = document.getElementById('search');
 
 function main() {
 	getRandomMeal();
@@ -24,14 +30,18 @@ async function getMealById(id) {
 }
 
 async function getMealsBySearch(term) {
-	const meals = await fetch(
+	const resp = await fetch(
 		`https://www.themealdb.com/api/json/v1/1/search.php?s=${term}`
 	);
+	const respData = await resp.json();
+	const meals = respData.meals;
+	return meals;
 }
 
 function addMeal(mealData, random = false) {
 	const meal = document.createElement('div');
 	meal.classList.add('meal');
+	meal.id = mealData.idMeal;
 	meal.innerHTML = `
       <div class="meal-header">
         ${random ? ` <span class="random">Random Recipe</span>` : ''}
@@ -66,6 +76,7 @@ function addMeal(mealData, random = false) {
 }
 
 async function fetchFavMeals(render = false) {
+	const meal_ids = JSON.parse(localStorage.getItem('mealIds'));
 	/* 
 	  Fastets method to get favorite meals from LS 
 		and append them to favorite meals container 
@@ -133,13 +144,23 @@ function removeMealFavEl(mealData) {
 }
 
 function addMealLS(mealId) {
+	const meal_ids = JSON.parse(localStorage.getItem('mealIds'));
 	const mealIds = meal_ids === null ? [] : meal_ids;
 	if (localStorage.getItem('mealId') === null) {
 		localStorage.setItem('mealIds', JSON.stringify([...mealIds, mealId]));
 	}
 }
 
+function addSearchResLS(mealId) {
+	const meal_ids = JSON.parse(localStorage.getItem('mealIds'));
+	const mealIds = search_results === null ? [] : search_results;
+	if (localStorage.getItem('mealId') === null) {
+		localStorage.setItem('searchRes', JSON.stringify([...mealIds, mealId]));
+	}
+}
+
 function removeMealLS(mealId) {
+	const meal_ids = JSON.parse(localStorage.getItem('mealIds'));
 	const mealIds = meal_ids === null ? [] : meal_ids;
 	localStorage.setItem('mealIds', JSON.stringify(mealIds.filter((id) => id !== mealId)));
 }
@@ -148,5 +169,30 @@ function getMealsLS() {
 	const mealIds = JSON.parse(localStorage.getItem('mealIds'));
 	return mealIds === null ? [] : mealIds;
 }
+
+function getMealIDs(nodes) {
+	const ids = [];
+	nodes.forEach((el) => {
+		ids.push(el.idMeal);
+	});
+
+	return ids;
+}
+
+searchBtn.addEventListener('click', async () => {
+	const search_value = searchInput.value;
+	const meals_not_null = await getMealsBySearch(search_value);
+	const search_val_not_null = !!search_value;
+
+	if (!meals_not_null) show(`There is no such ingredient as ${search_value}`);
+	if (meals_not_null && search_val_not_null) {
+		meals.innerHTML = '';
+
+		meals_not_null.forEach((meal) => {
+			//addSearchResLS(meal.idMeal);
+			addMeal(meal);
+		});
+	}
+});
 
 main();
