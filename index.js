@@ -2,12 +2,15 @@ import { show } from './dialog.js';
 
 const meals = document.getElementById('meals');
 const favoriteContainer = document.getElementById('fav-meals');
-const favs = document.querySelectorAll('.fav');
 let search_results;
 
 const searchInput = document.getElementById('search-bar');
 searchInput.placeholder = 'ingredient';
 const searchBtn = document.getElementById('search');
+
+const mealPopup = document.getElementById('meal-info-popup');
+const popupCloseBtn = document.getElementById('close-popup');
+const mealInfoEl = document.getElementById('meal-info');
 
 function main() {
 	getRandomMeal();
@@ -43,7 +46,7 @@ function addMeal(mealData, random = false) {
 	meal.classList.add('meal');
 	meal.id = mealData.idMeal;
 	meal.innerHTML = `
-      <div class="meal-header">
+      <div id="meal-header" class="meal-header">
         ${random ? ` <span class="random">Random Recipe</span>` : ''}
         <img
           src="${mealData.strMealThumb}"
@@ -70,6 +73,11 @@ function addMeal(mealData, random = false) {
 			const node = createMealFavNode(mealData);
 			favoriteContainer.prepend(node);
 		}
+	});
+
+	const mealHeaderEl = meal.querySelector('#meal-header');
+	mealHeaderEl.addEventListener('click', () => {
+		showMealInfo(mealData);
 	});
 
 	meals.appendChild(meal);
@@ -112,7 +120,7 @@ function createMealFavNode(mealData) {
 	fav_meal.classList.add('fav');
 	fav_meal.id = mealData.idMeal;
 	fav_meal.innerHTML = `
-			<img
+			<img id="fav-img"
 				draggable="false"
 				src="${mealData.strMealThumb}/preview"
 				alt="${mealData.strMeal}"
@@ -123,8 +131,19 @@ function createMealFavNode(mealData) {
 			</button>
 `;
 
+	/* 	const favMeaEl = fav_meal.querySelector('#fav-img');
+	favMeaEl.addEventListener('click', () => {
+		showMealInfo(mealData);
+	});
+ */
+
+	fav_meal.addEventListener('click', () => {
+		showMealInfo(mealData);
+	});
+
 	const unfav_btn = fav_meal.querySelector('.unfav');
 	unfav_btn.addEventListener('click', (e) => {
+		e.stopPropagation();
 		const unfav = e.target.closest('li');
 		const unfav_id = unfav.id;
 		const meals = JSON.parse(localStorage.getItem('mealIds'));
@@ -194,5 +213,49 @@ searchBtn.addEventListener('click', async () => {
 		});
 	}
 });
+
+popupCloseBtn.addEventListener('click', () => {
+	mealPopup.classList.add('hidden');
+});
+
+function showMealInfo(mealData) {
+	// clear container before open
+	mealInfoEl.innerHTML = '';
+
+	//get ingredients and measures
+	const ingredients = [];
+	for (let i = 1; i <= 20; i++) {
+		const ingredient = mealData['strIngredient' + i];
+		const measure = mealData['strMeasure' + i];
+		if (ingredient) {
+			ingredients.push([`${ingredient}`, `${measure}`]);
+		} else {
+			break;
+		}
+	}
+	console.log(ingredients);
+	// update the meal Info
+	const mealEl = document.createElement('div');
+	mealEl.innerHTML = `
+		<h1>${mealData.strMeal}</h1>
+		<img
+			src="${mealData.strMealThumb}"
+			alt="${mealData.strMeal}"
+		/>
+		<h3 class="meal-info-headers" >Instructions:</h3>
+		<textarea readonly>${mealData.strInstructions}</textarea>
+		<h3 class="meal-info-headers">Ingredients:</h3>
+		<ul class="ingredients">
+			${ingredients
+				.map((el) => {
+					return `<li id="${el[0]}">${el[0]}<span>${el[1]}</span></li>`;
+				})
+				.join('')}
+		</ul>
+	`;
+	mealInfoEl.appendChild(mealEl);
+
+	mealPopup.classList.remove('hidden');
+}
 
 main();

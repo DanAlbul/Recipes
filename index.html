@@ -28,6 +28,7 @@
 				<a id="close-alert">OK</a>
 			</div>
 		</div>
+
 		<div class="mobile-container">
 			<header>
 				<div class="burger-menu">
@@ -38,12 +39,24 @@
 					<i class="fa-solid fa-magnifying-glass"></i>
 				</button>
 			</header>
+
 			<div class="fav-container">
 				<h3>Favourite Meals</h3>
 				<ul class="fav-meals" id="fav-meals"></ul>
 			</div>
+
 			<div class="meals" id="meals"></div>
 		</div>
+
+		<div class="popup-container hidden" id="meal-info-popup">
+			<div class="popup">
+				<button class="close-popup" id="close-popup">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<div id="meal-info" class="meal-info"></div>
+			</div>
+		</div>
+
 		<script type="module" src="index.js"></script>
 	</body>
 </html>
