@@ -58,7 +58,7 @@ export function createMealFavNode(mealData) {
 	});
  */
 
-	fav_meal.addEventListener('click', () => {
+	fav_meal.addEventListener('click', (e) => {
 		showMealInfo(mealData);
 	});
 

@@ -105,6 +105,7 @@ header button {
 }
 
 .fav-container {
+	position: relative;
 	background-color: rgba(226, 187, 88, 0.402);
 	height: 11.8rem;
 	padding: 0.5rem 0;
@@ -119,12 +120,19 @@ header button {
 	margin-bottom: 0.4rem;
 }
 
+#slider {
+	position: absolute;
+	height: 9rem;
+	overflow: hidden;
+	width: auto;
+}
+
 .fav-meals {
+	position: relative;
 	margin: 0;
+	width: auto;
 	display: flex;
 	list-style-type: none;
-	width: 1000px;
-	overflow: scroll;
 	padding: 0;
 }
 
